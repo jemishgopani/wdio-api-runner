@@ -1,0 +1,109 @@
+/**
+ * Custom CSS for wdio-api-runner documentation
+ */
+
+:root {
+    --ifm-color-primary: #ea5906;
+    --ifm-color-primary-dark: #d35005;
+    --ifm-color-primary-darker: #c74b05;
+    --ifm-color-primary-darkest: #a43e04;
+    --ifm-color-primary-light: #f16a1e;
+    --ifm-color-primary-lighter: #f27429;
+    --ifm-color-primary-lightest: #f5894a;
+    --ifm-code-font-size: 95%;
+    --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme='dark'] {
+    --ifm-color-primary: #f5894a;
+    --ifm-color-primary-dark: #f37530;
+    --ifm-color-primary-darker: #f26b22;
+    --ifm-color-primary-darkest: #d95309;
+    --ifm-color-primary-light: #f79d64;
+    --ifm-color-primary-lighter: #f8a772;
+    --ifm-color-primary-lightest: #fbc49e;
+    --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+}
+
+/* Code blocks */
+.prism-code {
+    font-size: 14px;
+}
+
+/* Tables */
+table {
+    display: table;
+    width: 100%;
+}
+
+table th {
+    background-color: var(--ifm-color-emphasis-100);
+}
+
+[data-theme='dark'] table th {
+    background-color: var(--ifm-color-emphasis-200);
+}
+
+/* Admonitions */
+.admonition {
+    border-radius: 8px;
+}
+
+/* Sidebar */
+.theme-doc-sidebar-menu {
+    font-size: 15px;
+}
+
+/* Hero section */
+.hero {
+    background: linear-gradient(135deg, #ea5906 0%, #ff8c00 100%);
+}
+
+.hero__title {
+    font-size: 3rem;
+}
+
+.hero__subtitle {
+    font-size: 1.5rem;
+}
+
+/* Feature cards */
+.feature-card {
+    padding: 1.5rem;
+    border-radius: 8px;
+    background: var(--ifm-card-background-color);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* API reference styling */
+.api-method {
+    font-family: var(--ifm-font-family-monospace);
+    background: var(--ifm-color-emphasis-100);
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+}
+
+/* Navbar */
+.navbar__title {
+    font-weight: 700;
+}
+
+/* Footer */
+.footer {
+    background-color: #1a1a1a;
+}
+
+.footer__title {
+    color: #fff;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .hero__title {
+        font-size: 2rem;
+    }
+
+    .hero__subtitle {
+        font-size: 1.2rem;
+    }
+}

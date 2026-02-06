@@ -1,0 +1,5 @@
+node_modules/
+har-logs/
+build/
+*.log
+.DS_Store
