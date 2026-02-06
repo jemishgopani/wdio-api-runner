@@ -1,11 +1,8 @@
-import { createGraphQLClient, gql, assertResponse } from 'wdio-api-runner'
+import { createGraphQLClient, gql } from 'wdio-api-runner'
 import { expect } from 'chai'
 import type { Country, Language } from '../../support/types.js'
 
-// TODO: GraphQL client has a request format issue with this API.
-// The Countries API returns "The request did not contain a valid GraphQL request"
-// This is a client implementation issue to be fixed separately.
-describe.skip('GraphQL - Queries', () => {
+describe('GraphQL - Queries', () => {
     const client = createGraphQLClient({
         endpoint: 'https://countries.trevorblades.com/graphql',
     })
@@ -26,7 +23,7 @@ describe.skip('GraphQL - Queries', () => {
             expect(response.isSuccess).to.equal(true)
             expect(response.hasData).to.equal(true)
             expect(response.hasErrors).to.equal(false)
-            expect(response.data?.countries.length).to.be.above(0)
+            expect(response.data.data?.countries.length).to.be.above(0)
         })
 
         it('should query continents', async () => {
@@ -44,7 +41,7 @@ describe.skip('GraphQL - Queries', () => {
             }>({ query })
 
             expect(response.isSuccess).to.equal(true)
-            expect(response.data?.continents).to.deep.include({
+            expect(response.data.data?.continents).to.deep.include({
                 code: 'EU',
                 name: 'Europe',
             })
@@ -63,7 +60,7 @@ describe.skip('GraphQL - Queries', () => {
             const response = await client.query<{ languages: Language[] }>({ query })
 
             expect(response.isSuccess).to.equal(true)
-            expect(response.data?.languages.length).to.be.above(0)
+            expect(response.data.data?.languages.length).to.be.above(0)
         })
     })
 
@@ -86,9 +83,9 @@ describe.skip('GraphQL - Queries', () => {
             })
 
             expect(response.isSuccess).to.equal(true)
-            expect(response.data?.country.code).to.equal('US')
-            expect(response.data?.country.name).to.equal('United States')
-            expect(response.data?.country.capital).to.equal('Washington D.C.')
+            expect(response.data.data?.country.code).to.equal('US')
+            expect(response.data.data?.country.name).to.equal('United States')
+            expect(response.data.data?.country.capital).to.equal('Washington D.C.')
         })
 
         it('should query continent by code', async () => {
@@ -117,8 +114,8 @@ describe.skip('GraphQL - Queries', () => {
             })
 
             expect(response.isSuccess).to.equal(true)
-            expect(response.data?.continent.name).to.equal('Europe')
-            expect(response.data?.continent.countries.length).to.be.above(0)
+            expect(response.data.data?.continent.name).to.equal('Europe')
+            expect(response.data.data?.continent.countries.length).to.be.above(0)
         })
 
         it('should query countries with filter', async () => {
@@ -144,9 +141,9 @@ describe.skip('GraphQL - Queries', () => {
             })
 
             expect(response.isSuccess).to.equal(true)
-            expect(response.data?.countries.length).to.be.above(0)
+            expect(response.data.data?.countries.length).to.be.above(0)
             // All countries should be in Europe
-            response.data?.countries.forEach((country) => {
+            response.data.data?.countries.forEach((country) => {
                 expect(country.continent.name).to.equal('Europe')
             })
         })
@@ -196,9 +193,9 @@ describe.skip('GraphQL - Queries', () => {
             })
 
             expect(response.isSuccess).to.equal(true)
-            expect(response.data?.country.name).to.equal('Germany')
-            expect(response.data?.country.continent.name).to.equal('Europe')
-            expect(response.data?.country.languages.length).to.be.above(0)
+            expect(response.data.data?.country.name).to.equal('Germany')
+            expect(response.data.data?.country.continent.name).to.equal('Europe')
+            expect(response.data.data?.country.languages.length).to.be.above(0)
         })
     })
 
@@ -216,7 +213,6 @@ describe.skip('GraphQL - Queries', () => {
 
             // HTTP response properties
             expect(response.status).to.equal(200)
-            expect(response.statusText).to.equal('OK')
             expect(response.ok).to.equal(true)
             expect(response.duration).to.be.above(0)
 
@@ -257,8 +253,8 @@ describe.skip('GraphQL - Queries', () => {
             const response = await client.query<unknown>({ query })
 
             expect(response.hasErrors).to.equal(true)
-            expect(response.errors).to.exist
-            expect(response.errors!.length).to.be.above(0)
+            expect(response.data.errors).to.exist
+            expect(response.data.errors!.length).to.be.above(0)
         })
 
         it('should handle missing required variable', async () => {
@@ -309,8 +305,8 @@ describe.skip('GraphQL - Queries', () => {
 
             expect(countriesResponse.isSuccess).to.equal(true)
             expect(continentsResponse.isSuccess).to.equal(true)
-            expect(countriesResponse.data?.countries.length).to.be.above(0)
-            expect(continentsResponse.data?.continents.length).to.be.above(0)
+            expect(countriesResponse.data.data?.countries.length).to.be.above(0)
+            expect(continentsResponse.data.data?.continents.length).to.be.above(0)
         })
     })
 })

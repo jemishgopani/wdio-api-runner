@@ -120,6 +120,7 @@ export type {
     GraphQLOperationType,
     GraphQLVariables,
     GraphQLOperation,
+    GraphQLOperationInput,
     GraphQLErrorLocation,
     GraphQLError,
     GraphQLResponseData,

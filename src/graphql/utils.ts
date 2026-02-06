@@ -6,6 +6,11 @@ import type { GraphQLOperation, GraphQLVariables, GraphQLOperationType } from '.
 
 /**
  * Normalize operation input (string or object) to GraphQLOperation
+ * Handles various input formats including:
+ * - Plain query string
+ * - GraphQLOperation object
+ * - GraphQLTagResult (from gql``)
+ * - Nested { query: GraphQLTagResult } (common mistake)
  */
 export function normalizeOperation<TVariables extends GraphQLVariables>(
     operation: string | GraphQLOperation<TVariables>,
@@ -16,6 +21,18 @@ export function normalizeOperation<TVariables extends GraphQLVariables>(
             query: operation,
             operationName: extractOperationName(operation),
             variables,
+        }
+    }
+
+    // Handle nested case: { query: GraphQLTagResult } where query is an object with .query property
+    // This happens when users do: client.query({ query: gql`...` }) instead of client.query(gql`...`)
+    if (typeof operation.query === 'object' && operation.query !== null && 'query' in operation.query) {
+        const nested = operation.query as GraphQLOperation<TVariables>
+        return {
+            query: nested.query,
+            operationName: nested.operationName ?? operation.operationName,
+            variables: variables ?? nested.variables ?? operation.variables,
+            extensions: nested.extensions ?? operation.extensions,
         }
     }
 

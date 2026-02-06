@@ -32,6 +32,21 @@ export interface GraphQLOperation<TVariables = GraphQLVariables> {
     extensions?: Record<string, unknown>
 }
 
+/**
+ * Flexible input type for GraphQL operations
+ * Allows query to be a string, GraphQLOperation, or nested GraphQLTagResult
+ */
+export interface GraphQLOperationInput<TVariables = GraphQLVariables> {
+    /** The GraphQL query - can be string or result from gql`` template */
+    query: string | GraphQLOperation<TVariables>
+    /** Optional operation name for multi-operation documents */
+    operationName?: string
+    /** Variables for the operation */
+    variables?: TVariables
+    /** Extensions (vendor-specific) */
+    extensions?: Record<string, unknown>
+}
+
 // ========== GraphQL Response Types ==========
 
 /**
@@ -195,7 +210,7 @@ export interface GraphQLClient {
      * Execute a GraphQL query
      */
     query<TData = unknown, TVariables extends GraphQLVariables = GraphQLVariables>(
-        operation: string | GraphQLOperation<TVariables>,
+        operation: string | GraphQLOperation<TVariables> | GraphQLOperationInput<TVariables>,
         variables?: TVariables,
         options?: GraphQLRequestOptions
     ): Promise<GraphQLResponse<TData>>
@@ -204,7 +219,7 @@ export interface GraphQLClient {
      * Execute a GraphQL mutation
      */
     mutate<TData = unknown, TVariables extends GraphQLVariables = GraphQLVariables>(
-        operation: string | GraphQLOperation<TVariables>,
+        operation: string | GraphQLOperation<TVariables> | GraphQLOperationInput<TVariables>,
         variables?: TVariables,
         options?: GraphQLRequestOptions
     ): Promise<GraphQLResponse<TData>>
@@ -213,7 +228,7 @@ export interface GraphQLClient {
      * Execute a raw GraphQL request (for operations where type is determined dynamically)
      */
     request<TData = unknown, TVariables extends GraphQLVariables = GraphQLVariables>(
-        operation: GraphQLOperation<TVariables>,
+        operation: GraphQLOperation<TVariables> | GraphQLOperationInput<TVariables>,
         options?: GraphQLRequestOptions
     ): Promise<GraphQLResponse<TData>>
 
@@ -314,20 +329,22 @@ export interface QueryBuilder<TVariables extends GraphQLVariables = GraphQLVaria
     field(name: string, alias?: string): QueryBuilder<TVariables>
     /** Add a field with arguments */
     fieldWithArgs(name: string, args: Record<string, unknown>, alias?: string): QueryBuilder<TVariables>
+    /** Add arguments to the current parent field (used inside selectWith callback) */
+    args(args: Record<string, unknown>): QueryBuilder<TVariables>
 
     // Nested selection
     /** Select multiple simple fields */
     select(...fields: string[]): QueryBuilder<TVariables>
     /** Select a field with nested fields using a sub-builder */
-    selectWith(field: string, subBuilder: (builder: QueryBuilder) => QueryBuilder): QueryBuilder<TVariables>
+    selectWith(field: string, subBuilder: (builder: QueryBuilder) => QueryBuilder | void): QueryBuilder<TVariables>
 
     // Fragments
     /** Define a fragment */
-    fragment(name: string, onType: string, builder: (b: QueryBuilder) => QueryBuilder): QueryBuilder<TVariables>
+    fragment(name: string, onType: string, builder: (b: QueryBuilder) => QueryBuilder | void): QueryBuilder<TVariables>
     /** Use a named fragment spread */
     useFragment(name: string): QueryBuilder<TVariables>
     /** Add an inline fragment */
-    inlineFragment(onType: string, builder: (b: QueryBuilder) => QueryBuilder): QueryBuilder<TVariables>
+    inlineFragment(onType: string, builder: (b: QueryBuilder) => QueryBuilder | void): QueryBuilder<TVariables>
 
     // Directives
     /** Add @include directive to last field */

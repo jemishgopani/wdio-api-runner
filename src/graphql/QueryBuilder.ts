@@ -61,6 +61,8 @@ export function createQueryBuilder<TVariables extends GraphQLVariables = GraphQL
 
     // Track current context for nested selections
     let currentFields: FieldSelection[] = state.fields
+    // Track the current parent field for args() method
+    let currentParentField: FieldSelection | null = null
 
     const builder: QueryBuilder<TVariables> = {
         query(name?: string) {
@@ -97,6 +99,14 @@ export function createQueryBuilder<TVariables extends GraphQLVariables = GraphQL
             return builder
         },
 
+        args(args) {
+            // Add arguments to the current parent field (used inside selectWith callback)
+            if (currentParentField) {
+                currentParentField.args = { ...currentParentField.args, ...args }
+            }
+            return builder
+        },
+
         select(...fields) {
             for (const fieldName of fields) {
                 currentFields.push({ name: fieldName })
@@ -105,10 +115,24 @@ export function createQueryBuilder<TVariables extends GraphQLVariables = GraphQL
         },
 
         selectWith(fieldName, subBuilder) {
-            // Find or create the field
-            let field = currentFields.find((f) => f.name === fieldName)
+            // Handle alias syntax: "alias: fieldName"
+            let name = fieldName
+            let alias: string | undefined
+            if (fieldName.includes(':')) {
+                const parts = fieldName.split(':').map((s) => s.trim())
+                alias = parts[0]
+                name = parts[1]
+            }
+
+            // Find or create the field (match by both name and alias for aliases)
+            let field = currentFields.find((f) => {
+                if (alias) {
+                    return f.alias === alias && f.name === name
+                }
+                return f.name === fieldName && !f.alias
+            })
             if (!field) {
-                field = { name: fieldName, fields: [] }
+                field = { name, alias, fields: [] }
                 currentFields.push(field)
             } else if (!field.fields) {
                 field.fields = []
@@ -116,13 +140,16 @@ export function createQueryBuilder<TVariables extends GraphQLVariables = GraphQL
 
             // Save current context
             const previousFields = currentFields
+            const previousParentField = currentParentField
             currentFields = field.fields!
+            currentParentField = field
 
             // Build nested fields
             subBuilder(builder)
 
             // Restore context
             currentFields = previousFields
+            currentParentField = previousParentField
 
             return builder
         },

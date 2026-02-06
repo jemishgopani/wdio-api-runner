@@ -2,10 +2,7 @@ import { createGraphQLClient, createQueryBuilder } from 'wdio-api-runner'
 import { expect } from 'chai'
 import type { Country, Language } from '../../support/types.js'
 
-// TODO: GraphQL client has a request format issue with this API.
-// The Countries API returns "The request did not contain a valid GraphQL request"
-// This is a client implementation issue to be fixed separately.
-describe.skip('GraphQL - Query Builder', () => {
+describe('GraphQL - Query Builder', () => {
     const client = createGraphQLClient({
         endpoint: 'https://countries.trevorblades.com/graphql',
     })
@@ -28,7 +25,7 @@ describe.skip('GraphQL - Query Builder', () => {
             const response = await client.query<{ countries: Country[] }>(operation)
 
             expect(response.isSuccess).to.equal(true)
-            expect(response.data?.countries.length).to.be.above(0)
+            expect(response.data.data?.countries.length).to.be.above(0)
         })
 
         it('should build query with multiple root fields', async () => {
@@ -48,8 +45,8 @@ describe.skip('GraphQL - Query Builder', () => {
             }>(operation)
 
             expect(response.isSuccess).to.equal(true)
-            expect(response.data?.countries).to.exist
-            expect(response.data?.continents).to.exist
+            expect(response.data.data?.countries).to.exist
+            expect(response.data.data?.continents).to.exist
         })
     })
 
@@ -72,7 +69,7 @@ describe.skip('GraphQL - Query Builder', () => {
             })
 
             expect(response.isSuccess).to.equal(true)
-            expect(response.data?.country.name).to.equal('United States')
+            expect(response.data.data?.country.name).to.equal('United States')
         })
 
         it('should build query with multiple variables', async () => {
@@ -129,9 +126,9 @@ describe.skip('GraphQL - Query Builder', () => {
             })
 
             expect(response.isSuccess).to.equal(true)
-            expect(response.data?.country.name).to.equal('France')
-            expect(response.data?.country.languages.length).to.be.above(0)
-            expect(response.data?.country.continent.name).to.equal('Europe')
+            expect(response.data.data?.country.name).to.equal('France')
+            expect(response.data.data?.country.languages.length).to.be.above(0)
+            expect(response.data.data?.country.continent.name).to.equal('Europe')
         })
 
         it('should build deeply nested selection', async () => {
@@ -170,7 +167,7 @@ describe.skip('GraphQL - Query Builder', () => {
             })
 
             expect(response.isSuccess).to.equal(true)
-            expect(response.data?.continent.countries.length).to.be.above(0)
+            expect(response.data.data?.continent.countries.length).to.be.above(0)
         })
     })
 
@@ -197,8 +194,8 @@ describe.skip('GraphQL - Query Builder', () => {
             })
 
             expect(response.isSuccess).to.equal(true)
-            expect(response.data?.usa.name).to.equal('United States')
-            expect(response.data?.germany.name).to.equal('Germany')
+            expect(response.data.data?.usa.name).to.equal('United States')
+            expect(response.data.data?.germany.name).to.equal('Germany')
         })
     })
 
@@ -211,7 +208,8 @@ describe.skip('GraphQL - Query Builder', () => {
                 })
                 .build()
 
-            expect(operation.query).not.to.include('query ') // No operation name
+            // Anonymous queries still have 'query' keyword but no name
+            expect(operation.query).to.include('query {')
 
             const response = await client.query<{
                 continents: { code: string; name: string }[]
@@ -294,8 +292,8 @@ describe.skip('GraphQL - Query Builder', () => {
             })
 
             expect(response.isSuccess).to.equal(true)
-            expect(response.data?.country.name).to.equal('Japan')
-            expect(response.data?.country.capital).to.equal('Tokyo')
+            expect(response.data.data?.country.name).to.equal('Japan')
+            expect(response.data.data?.country.capital).to.equal('Tokyo')
         })
     })
 })
