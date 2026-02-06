@@ -46,7 +46,11 @@
     "testing",
     "automation",
     "rest",
-    "http"
+    "http",
+    "graphql",
+    "api-testing",
+    "test-runner",
+    "wdio-runner"
   ],
   "dependencies": {
     "@wdio/config": "^9.0.0",
